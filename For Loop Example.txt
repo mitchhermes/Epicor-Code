@@ -1,0 +1,23 @@
+if(chkAutoReceive.Checked == true)
+                    {
+
+                            adapJO.GetByID(currentJob);
+					{
+                            {
+								int totJobOprowCount = adapJO.JobEntryData.JobOper.Rows.Count - 1;
+								int rowsPerAsmZero = 0;
+								for (int i = 0; i <= totJobOprowCount; i++)
+								{
+									if (Convert.ToInt32(adapJO.JobEntryData.JobOper.Rows[i]["AssemblySeq"]) == Convert.ToInt32(0))
+									{
+										rowsPerAsmZero = rowsPerAsmZero + 1;
+									}
+								}
+								if (rowsPerAsmZero > 0)
+								{
+									adapJO.JobEntryData.JobOper.Rows[rowsPerAsmZero - 1]["AutoReceive"] = true;
+									adapJO.JobEntryData.JobOper.Rows[rowsPerAsmZero - 1]["RowMod"] = "U";
+									adapJO.Update();
+								}	
+                            chkAutoReceive.Checked = false;
+                            }

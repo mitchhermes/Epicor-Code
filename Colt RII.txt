@@ -1,0 +1,114 @@
+// **************************************************
+// Custom code for MainController
+// Created: 8/16/2016 10:25:42 AM
+// **************************************************
+using System;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Windows.Forms;
+using Epicor.Mfg.BO;
+using Epicor.Mfg.UI;
+using Epicor.Mfg.UI.Adapters;
+using Epicor.Mfg.UI.Customization;
+using Epicor.Mfg.UI.ExtendedProps;
+using Epicor.Mfg.UI.FormFunctions;
+using Epicor.Mfg.UI.FrameWork;
+using Epicor.Mfg.UI.Searches;
+
+public class Script
+{
+	// ** Wizard Insert Location - Do Not Remove 'Begin/End Wizard Added Module Level Variables' Comments! **
+	// Begin Wizard Added Module Level Variables **
+
+	// End Wizard Added Module Level Variables **
+
+	// Add Custom Module Level Variables Here **
+	Epicor.Mfg.UI.FrameWork.EpiGroupBox grp;
+	Epicor.Mfg.UI.FrameWork.EpiTextBox tstlink;
+	LinkLabel lblQCR = new LinkLabel();
+	public void InitializeCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Variable Initialization' lines **
+		// Begin Wizard Added Variable Initialization
+
+		// End Wizard Added Variable Initialization
+
+		// Begin Wizard Added Custom Method Calls
+
+		// End Wizard Added Custom Method Calls
+		grp= (Epicor.Mfg.UI.FrameWork.EpiGroupBox)csm.GetNativeControlReference("7e3d3f4d-7445-4b3a-8f20-5f2d5f48a426");
+		tstlink= (Epicor.Mfg.UI.FrameWork.EpiTextBox) csm.GetNativeControlReference("6b16d4d6-362f-4f3f-911f-c4babafdd079");
+		SetUpLinkLabel();
+	}
+
+	public void SetUpLinkLabel()
+	{
+	
+		lblQCR = new LinkLabel();
+		lblQCR.Name= "lblQCR";
+		lblQCR.Location= new  System.Drawing.Point (18, 30);
+		lblQCR.Size= new System.Drawing.Size (78, 10);
+		lblQCR.Text= "QCR Sheet";
+		lblQCR.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(lblQCR_LinkClicked);
+		grp.Controls.Add(lblQCR);  
+
+	}
+	
+	private void lblQCR_LinkClicked(object Sender, LinkLabelLinkClickedEventArgs e)
+	{
+		
+		//MessageBox.Show("XYZ");
+		//string target = lblQCR.Links.Count.ToString();
+		//string target = lblQCR.Links.Count.ToString();
+		string target = e.Link.LinkData.ToString();
+		//MessageBox.Show("123");
+		//string target = @"file://C:\Users\mshermes\Desktop\Archived5.10\Test Worked.docx";
+		//string namePath = grp.ToString();
+		//namePath = @"C:\\Users\\mshermes\\Desktop\\Archived5.10\\Test Worked.docx";
+		//MessageBox.Show(namePath);
+		//MessageBox.Show(target);
+		System.Diagnostics.Process.Start(target);
+	}
+
+//private void edvV_CD_RII_ResultsEntry_1View_EpiViewNotification(EpiDataView view, EpiNotifyArgs args)
+	{
+		// ** Argument Properties and Uses **
+		// view.dataView[args.Row]["FieldName"]
+		// args.Row, args.Column, args.Sender, args.NotifyType
+		// NotifyType.Initialize, NotifyType.AddRow, NotifyType.DeleteRow, NotifyType.InitLastView, NotifyType.InitAndResetTreeNodes
+		//if ((args.NotifyType == EpiTransaction.NotifyType.InitLastView))
+		{
+			//if ((args.Row > -1))
+			{
+				//"QCR_URL2".ToString();
+				//if(lblQCR.Links.Count>0)
+					//MessageBox.Show("Count>");
+					//lblQCR.Links[0].LinkData=view.dataView[view.Row]["QCR_URL2"].ToString();
+				//else
+					//MessageBox.Show("ELSE");
+					//lblQCR.Links.Add(0,lblQCR.Text.Length,view.dataView[view.Row]["QCR_URL2"].ToString());
+				
+	
+			}
+		}
+	}
+
+	public void DestroyCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Object Disposal' lines **
+		// Begin Wizard Added Object Disposal
+
+		// End Wizard Added Object Disposal
+
+		// Begin Custom Code Disposal
+
+		// End Custom Code Disposal
+
+		//lblQCR.LinkClicked -= new System.Windows.Forms.LinkLabelLinkClickedEventHandler(lblQCR_LinkClicked);
+		//lblQCR.Dispose();
+		//lblQCR=null;
+	}
+	
+	
+}

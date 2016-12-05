@@ -1,0 +1,293 @@
+// **************************************************
+// Custom code for QuickJobForm
+// Created: 2014-12-18 10:13:57 AM
+// **************************************************
+using System;
+using System.Linq;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Windows.Forms;
+using Ice.Lib;
+using Erp.BO;
+using Ice.BO;
+using Erp.UI;
+using Ice.Adapters;
+using Erp.Adapters;
+using Ice.Lib.Customization;
+using Ice.Lib.ExtendedProps;
+using Ice.UI.FormFunctions;
+using Ice.Lib.Framework;
+using Ice.Lib.Searches;
+using System.Reflection;
+
+public class Script
+{
+	// ** Wizard Insert Location - Do Not Remove 'Begin/End Wizard Added Module Level Variables' Comments! **
+	// Begin Wizard Added Module Level Variables **
+	private EpiDataView edvJob;
+
+	private EpiDataView edvQJ;
+	// End Wizard Added Module Level Variables **
+
+	// Add Custom Module Level Variables Here **
+	private EpiDataView JobHead;
+	private EpiDataView JobOper;
+	private JobEntryAdapter adapJH;
+	private JobEntryAdapter adapJO;
+	private JobOperSearchAdapter adapJOList;	
+
+	private string currentJob = "";
+
+	private static Infragistics.Win.UltraWinToolbars.UltraToolbarsManager toolbarManager;
+
+	public void InitializeCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Variable Initialization' lines **
+		// Begin Wizard Added Variable Initialization
+
+		this.edvJob = ((EpiDataView)(this.oTrans.EpiDataViews["Job"]));
+		this.edvJob.EpiViewNotification += new EpiViewNotification(this.edvJob_EpiViewNotification);
+		this.edvQJ = ((EpiDataView)(this.oTrans.EpiDataViews["QJ"]));
+		this.edvQJ.EpiViewNotification += new EpiViewNotification(this.edvQJ_EpiViewNotification);
+		this.baseToolbarsManager.ToolClick += new Infragistics.Win.UltraWinToolbars.ToolClickEventHandler(this.baseToolbarsManager_ToolClick);
+		// End Wizard Added Variable Initialization
+
+		// Begin Wizard Added Custom Method Calls
+
+		// End Wizard Added Custom Method Calls
+
+		adapJH = new JobEntryAdapter(oTrans);
+		adapJH.BOConnect();
+
+		adapJO = new JobEntryAdapter(oTrans);
+		adapJO.BOConnect();
+
+		adapJOList = new JobOperSearchAdapter(oTrans);
+		adapJOList.BOConnect();
+
+		object obj = typeof(Erp.UI.App.QuickJobEntry.QuickJobForm).InvokeMember("baseToolbarsManager", BindingFlags.Instance | BindingFlags.GetField | BindingFlags.NonPublic, null, QuickJobForm, null);
+		toolbarManager = (Infragistics.Win.UltraWinToolbars.UltraToolbarsManager)obj;
+
+		addImportButton();
+		
+		JobOper = new EpiDataView();
+		JobOper.dataView = new DataView(adapJO.JobEntryData.JobOper);
+
+		if (!oTrans.EpiDataViews.Contains("JobOper"))
+			oTrans.Add("JobOper", JobOper);
+	/*
+		JobHead = new EpiDataView();
+		JobHead.dataView = new DataView(adapJH.JobEntryData.JobHead);
+
+		if (!oTrans.EpiDataViews.Contains("JobHead"))
+			oTrans.Add("JobHead", JobHead);
+	*/
+	}
+
+	public void DestroyCustomCode()
+	{
+		// ** Wizard Insert Location - Do not delete 'Begin/End Wizard Added Object Disposal' lines **
+		// Begin Wizard Added Object Disposal
+
+		this.edvJob.EpiViewNotification -= new EpiViewNotification(this.edvJob_EpiViewNotification);
+		this.edvJob = null;
+		this.edvQJ.EpiViewNotification -= new EpiViewNotification(this.edvQJ_EpiViewNotification);
+		this.edvQJ = null;
+		this.baseToolbarsManager.ToolClick -= new Infragistics.Win.UltraWinToolbars.ToolClickEventHandler(this.baseToolbarsManager_ToolClick);
+		// End Wizard Added Object Disposal
+
+		// Begin Custom Code Disposal
+
+		// End Custom Code Disposal
+		JobHead.Dispose();
+		JobHead = null;
+
+		JobOper.Dispose();
+		JobOper = null;
+
+		adapJH.Dispose();
+		adapJH = null;
+
+		adapJO.Dispose();
+		adapJO = null;
+
+		adapJOList.Dispose();
+		adapJOList = null;
+
+
+	}
+
+	private void edvJob_EpiViewNotification(EpiDataView view, EpiNotifyArgs args)
+	{
+		// ** Argument Properties and Uses **
+		// view.dataView[args.Row]["FieldName"]
+		// args.Row, args.Column, args.Sender, args.NotifyType
+		// NotifyType.Initialize, NotifyType.AddRow, NotifyType.DeleteRow, NotifyType.InitLastView, NotifyType.InitAndResetTreeNodes
+		if ((args.NotifyType == EpiTransaction.NotifyType.AddRow))
+		{
+			if ((args.Row > -1))
+			{
+			}
+		}
+	}
+
+	private void baseToolbarsManager_ToolClick(object sender, Infragistics.Win.UltraWinToolbars.ToolClickEventArgs args)
+	{
+		switch (args.Tool.Key)
+		{
+			case "SaveCust":
+					if(edvQJ.Row > -1)
+					{
+						currentJob = edvQJ.dataView[edvQJ.Row]["JobNum"].ToString();
+						oTrans.Update();
+						
+						oTrans.GetNewQuickJob("");
+					}
+				break;
+		}
+//		switch ((((Infragistics.Win.UltraWinToolbars.UltraToolbarsManager)sender).ActiveTool.Key)) 
+//		{
+//			case "SaveTool":
+//				if(edvQJ.Row > -1)
+//				{
+//					currentJob = edvQJ.dataView[edvQJ.Row]["JobNum"].ToString();
+//					MessageBox.Show(currentJob);
+//				}
+//				break;
+//		}
+
+	}
+
+	private void edvQJ_EpiViewNotification(EpiDataView view, EpiNotifyArgs args)
+	{
+		// ** Argument Properties and Uses **
+		// view.dataView[args.Row]["FieldName"]
+		// args.Row, args.Column, args.Sender, args.NotifyType
+		// NotifyType.Initialize, NotifyType.AddRow, NotifyType.DeleteRow, NotifyType.InitLastView, NotifyType.InitAndResetTreeNodes
+		if ((args.Row > -1))
+		{
+			//MessageBox.Show("currentJob ." + currentJob + ". /  View Job " + edvQJ.dataView[args.Row]["JobNum"].ToString());
+			if(currentJob != "" && currentJob != edvQJ.dataView[args.Row]["JobNum"].ToString())
+			{
+				//MessageBox.Show("Processing Job " + currentJob);
+
+				adapJH.clearList();
+				adapJH.clearData();
+
+				adapJO.clearList();
+				adapJO.clearData();
+	
+				SearchOptions opts = new SearchOptions(SearchMode.AutoSearch);
+				opts.DataSetMode = DataSetMode.ListDataSet;
+				opts.PreLoadSearchFilter = "JobNum = '" + currentJob + "'";
+				adapJH.InvokeSearch(opts);
+				adapJO.InvokeSearch(opts);
+	
+				if(adapJH.JobEntryList.JobHeadList.Rows.Count > 0)
+				{
+					//MessageBox.Show("Job found  / Backflush = " + chkBackflush.Checked.ToString());
+					if(chkBackflush.Checked == true)
+					{
+						//MessageBox.Show("updating job");
+						adapJH.GetByID(currentJob);
+						adapJH.JobEntryData.JobHead.Rows[0]["CheckBox01"] = true;
+						adapJH.JobEntryData.JobHead.Rows[0]["RowMod"] = "U";
+						adapJH.Update();
+						//MessageBox.Show("JobHead.CheckBox01 = " + adapJH.JobEntryData.JobHead.Rows[0]["CheckBox01"].ToString());
+						chkBackflush.Checked = false;
+	
+					}
+					/*if(chkAutoReceive.Checked == true)
+					{
+						MessageBox.Show("updating job");
+						adapJH.GetByID(currentJob);
+						adapJH.JobEntryData.JobHead.Rows[0]["AutoRec_c"] = true;
+						adapJH.JobEntryData.JobHead.Rows[0]["RowMod"] = "U";
+						adapJH.Update();
+						//MessageBox.Show("JobHead.CheckBox01 = " + adapJH.JobEntryData.JobHead.Rows[0]["CheckBox01"].ToString());
+						chkAutoReceive.Checked = false;
+	
+					}
+				}*/
+				/*if(adapJO.JobEntryList.JobHeadList.Rows.Count > 0 && adapJO.JobEntryList.JobHeadList.Rows.Count < 2)
+				{
+					//MessageBox.Show("Job found  / Backflush = " + chkBackflush.Checked.ToString());
+					if(chkAutoReceive.Checked == true)
+					{
+							adapJO.GetByID(currentJob);
+							adapJO.JobEntryData.JobOper.Rows[0]["AutoReceive"] = true;
+							adapJO.JobEntryData.JobOper.Rows[0]["RowMod"] = "U";
+							adapJO.Update();
+							MessageBox.Show(adapJO.JobEntryData.JobOper.Rows[0]["OPDesc"].ToString());
+							chkAutoReceive.Checked = false;
+					}
+				}*/
+				if(adapJO.JobEntryList.JobHeadList.Rows.Count > 0)
+				{
+					if(chkAutoReceive.Checked == true)
+                    {
+
+                            adapJO.GetByID(currentJob);
+					{
+                            {
+								int totJobOprowCount = adapJO.JobEntryData.JobOper.Rows.Count - 1;
+								int rowsPerAsmZero = 0;
+								for (int i = 0; i <= totJobOprowCount; i++)
+								{
+									if (Convert.ToInt32(adapJO.JobEntryData.JobOper.Rows[i]["AssemblySeq"]) == Convert.ToInt32(0))
+									{
+										rowsPerAsmZero = rowsPerAsmZero + 1;
+									}
+								}
+								if (rowsPerAsmZero > 0)
+								{
+									adapJO.JobEntryData.JobOper.Rows[rowsPerAsmZero - 1]["AutoReceive"] = true;
+									adapJO.JobEntryData.JobOper.Rows[rowsPerAsmZero - 1]["RowMod"] = "U";
+									adapJO.Update();
+								}	
+                            chkAutoReceive.Checked = false;
+                            }
+                    }
+				}
+
+/*				if(adapJH.JobEntryList.JobHeadList.Rows.Count > 0)
+				{
+					//MessageBox.Show("Job found  / Backflush = " + chkBackflush.Checked.ToString());
+
+				}*/
+				currentJob = "";
+			}
+			
+
+			
+		}
+
+	}
+}
+}
+	public static Infragistics.Win.UltraWinToolbars.ButtonTool addImportButton()
+    {
+        Infragistics.Win.UltraWinToolbars.ButtonTool copyJobButton = new Infragistics.Win.UltraWinToolbars.ButtonTool("SaveCust");
+        Infragistics.Win.UltraWinToolbars.UltraToolbar ultrabar = default(Infragistics.Win.UltraWinToolbars.UltraToolbar);
+
+        if (toolbarManager.Tools.Exists("SaveCust") == false) 
+    	{
+            toolbarManager.Tools.Add(copyJobButton);
+
+            ultrabar = (Infragistics.Win.UltraWinToolbars.UltraToolbar)toolbarManager.Toolbars["Standard Tools"];
+            ultrabar.Tools.AddRange(new Infragistics.Win.UltraWinToolbars.ToolBase[] { copyJobButton });
+
+            System.Drawing.Image intFuncImage = EpiUIImages.GetImage("Save");
+            Infragistics.Win.Appearance app = new Infragistics.Win.Appearance();
+            app.Image = intFuncImage;
+
+            toolbarManager.Tools["SaveCust"].SharedProps.AppearancesLarge.Appearance = app;
+            toolbarManager.Tools["SaveCust"].SharedProps.AppearancesSmall.Appearance = app;
+            toolbarManager.Tools["SaveTool"].SharedProps.Enabled = false;
+			toolbarManager.Tools["SaveTool"].SharedProps.Visible = false;
+        }
+
+                    return copyJobButton;
+    }
+}
